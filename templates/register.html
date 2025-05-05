@@ -1,13 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Kayıt Ol</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Hastane Yönetim Sistemi</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Sayfa yüklendiğinde flash mesajlarını 5 saniye sonra gizle
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var flashMessages = document.querySelector('.flash-messages');
+                if (flashMessages) {
+                    flashMessages.style.opacity = '0';
+                    setTimeout(function() {
+                        flashMessages.style.display = 'none';
+                    }, 500);
+                }
+            }, 5000);
+        });
+    </script>
 </head>
 <body>
     <div class="form-container">
-        <h2>Kayıt Ol</h2>
+        <div class="logo">
+            <i class="fas fa-hospital"></i>
+        </div>
+        <h2>Hastane Yönetim Sistemi</h2>
 
         <!-- Flash Mesajları Görüntüleme -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,9 +41,21 @@
         {% endwith %}
 
         <form method="POST" action="/register">
-            <input type="text" name="username" placeholder="Kullanıcı Adı" required>
-            <input type="password" name="password" placeholder="Şifre" required>
-            <input type="password" name="confirm_password" placeholder="Şifreyi Onayla" required>
+            <div class="input-group">
+                <label for="username">Kullanıcı Adı</label>
+                <input type="text" id="username" name="username" placeholder="Kullanıcı adı oluşturun" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Şifre</label>
+                <input type="password" id="password" name="password" placeholder="Şifre oluşturun" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="confirm_password">Şifre Tekrarı</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Şifrenizi tekrar girin" required>
+            </div>
+            
             <button type="submit">Kayıt Ol</button>
             <p>Zaten hesabınız var mı? <a href="/login">Giriş Yap</a></p>
         </form>

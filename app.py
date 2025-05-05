@@ -7,11 +7,11 @@ app.secret_key = 'your-secret-key'
 
 def get_db_connection():
     return pymysql.connect(
-    host='db',
-    user='root',
-    password='root',
-    database='hospital',
-    cursorclass=pymysql.cursors.DictCursor
+        host='db',
+        user='root',
+        password='root',
+        database='hospital',
+        cursorclass=pymysql.cursors.DictCursor
     )
 
 def create_tables():
@@ -39,6 +39,12 @@ def create_tables():
     """)
     conn.commit()
     conn.close()
+
+@app.before_request
+def ensure_tables_exist():
+    if not hasattr(app, 'tables_created'):
+        create_tables()
+        app.tables_created = True
 
 @app.route('/')
 def index():
@@ -98,6 +104,7 @@ def register():
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user_id' not in session:
+        flash("Lütfen önce giriş yapın.", "warning")
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -107,6 +114,22 @@ def dashboard():
         telefon = request.form['telefon']
         bolum = request.form['bolum']
         sikayet = request.form['sikayet']
+        
+        # Ad ve soyad validasyonu
+        import re
+        if not re.match(r'^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$', ad) or not re.match(r'^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$', soyad):
+            flash("Ad ve soyad sadece harf ve boşluk içerebilir.", "danger")
+            return redirect(url_for('dashboard'))
+        
+        # TC Kimlik validasyonu
+        if not tc.isdigit() or len(tc) != 11:
+            flash("TC Kimlik numarası 11 haneli ve sadece rakamlardan oluşmalıdır.", "danger")
+            return redirect(url_for('dashboard'))
+        
+        # Telefon validasyonu
+        if not re.match(r'^[0-9\+\-\s]+$', telefon):
+            flash("Telefon numarası geçerli değil.", "danger")
+            return redirect(url_for('dashboard'))
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -129,5 +152,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    create_tables()
     app.run(host='0.0.0.0', port=5000, debug=True)

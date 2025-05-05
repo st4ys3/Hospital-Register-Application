@@ -1,75 +1,213 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-}
-
-.form-container {
+    min-height: 100vh;
+  }
+  
+  .form-container {
     background: white;
     padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
-}
-
-h2 {
-    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+    transition: all 0.3s ease;
+  }
+  
+  .form-container:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+  
+  .logo {
     text-align: center;
-}
-
-form input {
+    margin-bottom: 20px;
+  }
+  
+  .logo i {
+    font-size: 48px;
+    color: #4a6bdf;
+  }
+  
+  h2 {
+    margin-bottom: 25px;
+    text-align: center;
+    color: #333;
+    font-weight: 600;
+    font-size: 24px;
+  }
+  
+  .input-group {
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+  }
+  
+  form input,
+  form textarea,
+  form select {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 12px 15px;
+    margin-bottom: 15px;
     border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-button {
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+  }
+  
+  form input:focus,
+  form textarea:focus,
+  form select:focus {
+    border-color: #4a6bdf;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 107, 223, 0.2);
+  }
+  
+  form textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  button {
     width: 100%;
-    padding: 10px;
-    background: #4285f4;
+    padding: 14px;
+    background: #4a6bdf;
     border: none;
     color: white;
-    border-radius: 5px;
-    font-weight: bold;
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-}
-
-button:hover {
-    background: #357ae8;
-}
-
-p {
-    margin-top: 15px;
+    font-size: 16px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(74, 107, 223, 0.2);
+  }
+  
+  button:hover {
+    background: #3a5bcf;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 10px rgba(74, 107, 223, 0.3);
+  }
+  
+  button:active {
+    transform: translateY(0);
+  }
+  
+  p {
+    margin-top: 20px;
     text-align: center;
-}
-/* Flash Mesajları İçin Stil */
-.flash-messages {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  a {
+    color: #4a6bdf;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  a:hover {
+    color: #3a5bcf;
+    text-decoration: underline;
+  }
+  
+  /* Flash Mesajları İçin Stil */
+  .flash-messages {
     list-style-type: none;
     padding: 0;
-}
-
-.flash-messages li {
+    margin-bottom: 20px;
+    transition: opacity 0.5s ease;
+  }
+  
+  .flash-messages li {
     margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-}
-
-.flash-messages .info {
-    background-color: #cce5ff;
-    color: #004085;
-}
-
-.flash-messages .success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.flash-messages .danger {
-    background-color: #f8d7da;
-    color: #721c24;
-}
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+  }
+  
+  .flash-messages .info {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border-left: 4px solid #2196f3;
+  }
+  
+  .flash-messages .success {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+    border-left: 4px solid #4caf50;
+  }
+  
+  .flash-messages .danger {
+    background-color: #ffebee;
+    color: #b71c1c;
+    border-left: 4px solid #f44336;
+  }
+  
+  .flash-messages .warning {
+    background-color: #fff8e1;
+    color: #ff6f00;
+    border-left: 4px solid #ffc107;
+  }
+  
+  /* Navbar Stili */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .navbar h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+  
+  .logout-btn {
+    background: transparent;
+    color: #4a6bdf;
+    box-shadow: none;
+    width: auto;
+    padding: 8px 15px;
+    font-size: 14px;
+    border: 1px solid #4a6bdf;
+  }
+  
+  .logout-btn:hover {
+    background: #4a6bdf;
+    color: white;
+  }
+  
+  /* Responsive Tasarım */
+  @media (max-width: 768px) {
+    .form-container {
+      width: 90%;
+      padding: 30px 20px;
+    }
+  
+    h2 {
+      font-size: 20px;
+    }
+  
+    button {
+      padding: 12px;
+    }
+  }
+  
