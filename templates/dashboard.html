@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Hasta Kayıt</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Hasta Kayıt Paneli</h2>
+
+        {% if message %}
+            <p style="color: green;">{{ message }}</p>
+        {% endif %}
+
+        <form method="POST" action="/dashboard">
+            <input type="text" name="ad" placeholder="Ad" required>
+            <input type="text" name="soyad" placeholder="Soyad" required>
+            <input type="text" name="tc" placeholder="TC Kimlik No" required>
+            <input type="text" name="telefon" placeholder="Telefon Numarası" required>
+            <input type="text" name="bolum" placeholder="Bölüm" required>
+            <textarea name="sikayet" placeholder="Şikayet Bilgisi" required></textarea>
+            <button type="submit">Kaydet</button>
+        </form>
+    </div>
+</body>
+</html>
