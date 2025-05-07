@@ -7,20 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script>
-        // Sayfa yüklendiğinde flash mesajlarını 5 saniye sonra gizle
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                var flashMessages = document.querySelector('.flash-messages');
-                if (flashMessages) {
-                    flashMessages.style.opacity = '0';
-                    setTimeout(function() {
-                        flashMessages.style.display = 'none';
-                    }, 500);
-                }
-            }, 5000);
-        });
-    </script>
 </head>
 <body>
     <div class="form-container">
@@ -51,8 +37,11 @@
                 <input type="password" id="password" name="password" placeholder="Şifrenizi girin" required>
             </div>
             
-            <button type="submit">Giriş Yap</button>
+            <button type="submit">
+                <i class="fas fa-sign-in-alt"></i> Giriş Yap
+            </button>
             <p>Hesabınız yok mu? <a href="/register">Kayıt Ol</a></p>
+            <p><a href="/">Ana Sayfaya Dön</a></p>
         </form>
     </div>
 </body>
