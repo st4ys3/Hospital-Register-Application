@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hastane Yönetim Sistemi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="welcome-header">
+            <div class="logo">
+                <i class="fas fa-hospital"></i>
+            </div>
+            <h1>Hastane Yönetim Sistemi</h1>
+            <p>Modern ve kullanıcı dostu arayüzü ile hasta kayıtlarını kolayca yönetin, veritabanı yedeklerini alın ve sağlık hizmetlerinizi daha verimli hale getirin.</p>
+        </div>
+
+        <img src="{{ url_for('static', filename='images/hospital-hero.jpg') }}" alt="Hastane Yönetim Sistemi" class="hero-image">
+
+        <div class="welcome-cards">
+            <div class="welcome-card">
+                <i class="fas fa-user-md"></i>
+                <h3>Hasta Kayıt Paneli</h3>
+                <p>Hastaların bilgilerini hızlıca kaydedin, düzenleyin ve görüntüleyin.</p>
+                <a href="/login" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                </a>
+            </div>
+            
+            <div class="welcome-card">
+                <i class="fas fa-database"></i>
+                <h3>Veritabanı Yedekleme</h3>
+                <p>Hasta verilerinizi güvende tutmak için düzenli yedeklemeler yapın.</p>
+                <a href="/backup" class="btn btn-primary">
+                    <i class="fas fa-database"></i> Yedekleme Paneli
+                </a>
+            </div>
+            
+            <div class="welcome-card">
+                <i class="fas fa-user-plus"></i>
+                <h3>Yeni Hesap Oluştur</h3>
+                <p>Sisteme erişim için yeni bir kullanıcı hesabı oluşturun.</p>
+                <a href="/register" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Kayıt Ol
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 Hastane Yönetim Sistemi. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+</body>
+</html>
