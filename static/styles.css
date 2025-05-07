@@ -1,213 +1,402 @@
 body {
-    font-family: "Poppins", sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #f0f4f8 0%, #d7e3ec 100%);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: #334155;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-container {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 450px;
+  max-width: 90%;
+  transition: all 0.3s ease;
+  margin: 40px auto;
+}
+
+.form-container:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo i {
+  font-size: 48px;
+  color: #0ea5e9;
+}
+
+.logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+h2 {
+  margin-bottom: 25px;
+  text-align: center;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+}
+
+form input,
+form textarea,
+form select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+  border-color: #0ea5e9;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: #0ea5e9;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(14, 165, 233, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:hover {
+  background: #0284c7;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 10px rgba(14, 165, 233, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+p {
+  margin-top: 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+a {
+  color: #0ea5e9;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+a:hover {
+  color: #0284c7;
+  text-decoration: underline;
+}
+
+/* Flash Mesajları İçin Stil */
+.flash-messages {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.flash-messages li {
+  margin: 10px 0;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.flash-messages .info {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-left: 4px solid #0ea5e9;
+}
+
+.flash-messages .success {
+  background-color: #dcfce7;
+  color: #166534;
+  border-left: 4px solid #22c55e;
+}
+
+.flash-messages .danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #ef4444;
+}
+
+.flash-messages .warning {
+  background-color: #fef3c7;
+  color: #b45309;
+  border-left: 4px solid #f59e0b;
+}
+
+/* Navbar Stili */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.navbar h2 {
+  margin: 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  background: transparent;
+  color: #0ea5e9;
+  box-shadow: none;
+  width: auto;
+  padding: 8px 15px;
+  font-size: 14px;
+  border: 1px solid #0ea5e9;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn:hover {
+  background: #0ea5e9;
+  color: white;
+}
+
+.btn-primary {
+  background: #0ea5e9;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #0284c7;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #0ea5e9;
+  border: 1px solid #0ea5e9;
+}
+
+.btn-secondary:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+/* Welcome Page Styles */
+.welcome-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.welcome-header {
+  margin-bottom: 40px;
+}
+
+.welcome-header h1 {
+  font-size: 36px;
+  color: #0f172a;
+  margin-bottom: 15px;
+}
+
+.welcome-header p {
+  font-size: 18px;
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.welcome-cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 50px;
+}
+
+.welcome-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 300px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.welcome-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-card i {
+  font-size: 48px;
+  color: #0ea5e9;
+  margin-bottom: 20px;
+}
+
+.welcome-card h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #0f172a;
+}
+
+.welcome-card p {
+  color: #64748b;
+  margin-bottom: 25px;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+  margin: 30px 0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styles */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin: 40px auto;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table th {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+table tr:last-child td {
+  border-bottom: none;
+}
+
+table tr:hover {
+  background-color: #f8fafc;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 0;
+  color: #64748b;
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 15px;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
   .form-container {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    max-width: 90%;
-    transition: all 0.3s ease;
+    width: 90%;
+    padding: 30px 20px;
   }
-  
-  .form-container:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-  }
-  
-  .logo {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .logo i {
-    font-size: 48px;
-    color: #4a6bdf;
-  }
-  
+
   h2 {
-    margin-bottom: 25px;
-    text-align: center;
-    color: #333;
-    font-weight: 600;
-    font-size: 24px;
-  }
-  
-  .input-group {
-    margin-bottom: 20px;
-    position: relative;
-  }
-  
-  .input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #555;
-    font-weight: 500;
-  }
-  
-  form input,
-  form textarea,
-  form select {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
-    font-size: 14px;
-    transition: all 0.3s;
-  }
-  
-  form input:focus,
-  form textarea:focus,
-  form select:focus {
-    border-color: #4a6bdf;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(74, 107, 223, 0.2);
-  }
-  
-  form textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  
-  button {
-    width: 100%;
-    padding: 14px;
-    background: #4a6bdf;
-    border: none;
-    color: white;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.3s;
-    box-shadow: 0 4px 6px rgba(74, 107, 223, 0.2);
-  }
-  
-  button:hover {
-    background: #3a5bcf;
-    transform: translateY(-2px);
-    box-shadow: 0 7px 10px rgba(74, 107, 223, 0.3);
-  }
-  
-  button:active {
-    transform: translateY(0);
-  }
-  
-  p {
-    margin-top: 20px;
-    text-align: center;
-    color: #666;
-    font-size: 14px;
-  }
-  
-  a {
-    color: #4a6bdf;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s;
-  }
-  
-  a:hover {
-    color: #3a5bcf;
-    text-decoration: underline;
-  }
-  
-  /* Flash Mesajları İçin Stil */
-  .flash-messages {
-    list-style-type: none;
-    padding: 0;
-    margin-bottom: 20px;
-    transition: opacity 0.5s ease;
-  }
-  
-  .flash-messages li {
-    margin: 10px 0;
-    padding: 12px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    position: relative;
-  }
-  
-  .flash-messages .info {
-    background-color: #e3f2fd;
-    color: #0d47a1;
-    border-left: 4px solid #2196f3;
-  }
-  
-  .flash-messages .success {
-    background-color: #e8f5e9;
-    color: #1b5e20;
-    border-left: 4px solid #4caf50;
-  }
-  
-  .flash-messages .danger {
-    background-color: #ffebee;
-    color: #b71c1c;
-    border-left: 4px solid #f44336;
-  }
-  
-  .flash-messages .warning {
-    background-color: #fff8e1;
-    color: #ff6f00;
-    border-left: 4px solid #ffc107;
-  }
-  
-  /* Navbar Stili */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .navbar h2 {
-    margin: 0;
     font-size: 20px;
   }
-  
-  .logout-btn {
-    background: transparent;
-    color: #4a6bdf;
-    box-shadow: none;
-    width: auto;
-    padding: 8px 15px;
-    font-size: 14px;
-    border: 1px solid #4a6bdf;
+
+  button {
+    padding: 12px;
   }
-  
-  .logout-btn:hover {
-    background: #4a6bdf;
-    color: white;
+
+  .welcome-card {
+    width: 100%;
   }
-  
-  /* Responsive Tasarım */
-  @media (max-width: 768px) {
-    .form-container {
-      width: 90%;
-      padding: 30px 20px;
-    }
-  
-    h2 {
-      font-size: 20px;
-    }
-  
-    button {
-      padding: 12px;
-    }
+
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
   }
-  
+
+  .navbar-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Footer Styles */
+.footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 50px;
+  color: #64748b;
+  font-size: 14px;
+}
