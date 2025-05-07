@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Backup Paneli - Hastane Yönetim Sistemi</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+   <div class="container">
+       <div class="form-container">
+           <div class="logo">
+               <i class="fas fa-database"></i>
+           </div>
+           <h2>Veritabanı Yedeği</h2>
+
+           {% if session.user_id %}
+           <div class="navbar">
+               <div class="navbar-actions">
+                   <a href="/dashboard" class="btn btn-secondary">
+                       <i class="fas fa-user-plus"></i> Hasta Kayıt
+                   </a>
+                   <a href="/patients" class="btn btn-secondary">
+                       <i class="fas fa-users"></i> Kayıtlı Hastalar
+                   </a>
+                   <a href="/logout" class="btn">
+                       <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                   </a>
+               </div>
+           </div>
+           {% endif %}
+
+           {% with messages = get_flashed_messages(with_categories=true) %}
+               {% if messages %}
+                   <ul class="flash-messages">
+                       {% for category, message in messages %}
+                           <li class="{{ category }}">{{ message }}</li>
+                       {% endfor %}
+                   </ul>
+               {% endif %}
+           {% endwith %}
+
+           {% if not session.logged_in %}
+           <!-- Giriş Formu -->
+           <form method="POST">
+               <div class="input-group">
+                   <label for="username">Kullanıcı Adı</label>
+                   <input type="text" id="username" name="username" required>
+               </div>
+
+               <div class="input-group">
+                   <label for="password">Şifre</label>
+                   <input type="password" id="password" name="password" required>
+               </div>
+
+               <button type="submit" name="action" value="login">
+                   <i class="fas fa-sign-in-alt"></i> Giriş Yap
+               </button>
+               <p><a href="/">Ana Sayfaya Dön</a></p>
+           </form>
+           {% else %}
+           <!-- Backup Butonu -->
+           <form method="POST">
+               <button type="submit" name="action" value="backup">
+                   <i class="fas fa-download"></i> Backup Al
+               </button>
+           </form>
+
+           {% if log %}
+           <div class="table-container" style="margin-top: 20px;">
+               <h3>Backup Log</h3>
+               <pre style="background: #f1f5f9; padding: 15px; border-radius: 8px; overflow: auto;">{{ log }}</pre>
+           </div>
+           {% endif %}
+           {% endif %}
+       </div>
+   </div>
+</body>
+</html>
