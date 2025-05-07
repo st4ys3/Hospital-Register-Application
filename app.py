@@ -1,9 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+import subprocess
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
+
+# Ensure static/images directory exists
+os.makedirs('static/images', exist_ok=True)
 
 def get_db_connection():
     return pymysql.connect(
@@ -48,7 +53,7 @@ def ensure_tables_exist():
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,6 +75,13 @@ def login():
             return redirect(url_for('login'))
 
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session.pop('logged_in', None)
+    flash("Başarıyla çıkış yapıldı", "success")
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -104,32 +116,28 @@ def register():
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user_id' not in session:
-        flash("Lütfen önce giriş yapın.", "warning")
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        ad = request.form['ad']
+        ad = request.form['ad'] 
         soyad = request.form['soyad']
         tc = request.form['tc']
         telefon = request.form['telefon']
         bolum = request.form['bolum']
         sikayet = request.form['sikayet']
-        
-        # Ad ve soyad validasyonu
+
         import re
         if not re.match(r'^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$', ad) or not re.match(r'^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$', soyad):
-            flash("Ad ve soyad sadece harf ve boşluk içerebilir.", "danger")
-            return redirect(url_for('dashboard'))
-        
-        # TC Kimlik validasyonu
+           flash("Ad ve soyad sadece harf ve boşluk içerebilir.", "danger")
+           return redirect(url_for('dashboard'))
+      
         if not tc.isdigit() or len(tc) != 11:
-            flash("TC Kimlik numarası 11 haneli ve sadece rakamlardan oluşmalıdır.", "danger")
-            return redirect(url_for('dashboard'))
-        
-        # Telefon validasyonu
+           flash("TC Kimlik numarası 11 haneli ve sadece rakamlardan oluşmalıdır.", "danger")
+           return redirect(url_for('dashboard'))
+      
         if not re.match(r'^[0-9\+\-\s]+$', telefon):
-            flash("Telefon numarası geçerli değil.", "danger")
-            return redirect(url_for('dashboard'))
+           flash("Telefon numarası geçerli değil.", "danger")
+           return redirect(url_for('dashboard'))
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -145,11 +153,56 @@ def dashboard():
 
     return render_template('dashboard.html')
 
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    flash("Çıkış yapıldı.", "info")
-    return redirect(url_for('login'))
+@app.route('/patients')
+def patients():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM hastalar ORDER BY id DESC")
+    hastalar = cursor.fetchall()
+    conn.close()
+    
+    return render_template('patients.html', hastalar=hastalar)
+
+# Sabit kullanıcı adı ve şifre
+ADMIN_USERNAME = 'root'
+ADMIN_PASSWORD = 'root'
+
+@app.route('/backup', methods=['GET', 'POST'])
+def backup():
+    log = ""
+    if 'logged_in' not in session:
+        session['logged_in'] = False
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'login':
+            username = request.form.get('username')
+            password = request.form.get('password')
+
+            if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+                session['logged_in'] = True
+                flash("Giriş başarılı.", "success")
+            else:
+                flash("Kullanıcı adı veya şifre yanlış.", "danger")
+
+        elif action == 'backup' and session['logged_in']:
+            try:
+                subprocess.run(['bash', 'backup.sh'], check=True)
+                flash("Backup başarıyla alındı.", "success")
+            except subprocess.CalledProcessError:
+                flash("Backup alınırken hata oluştu.", "danger")
+
+            try:
+                with open('/var/log/backup.log', 'r') as f:
+                    log = f.read()
+            except FileNotFoundError:
+                log = "Log dosyası bulunamadı."
+
+    return render_template('backup.html', log=log)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
