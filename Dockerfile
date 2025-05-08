@@ -1,5 +1,7 @@
 FROM python:3.10
 
+RUN apt update && apt install -y default-mysql-client git && apt clean
+
 WORKDIR /app
 
 COPY requirements.txt . 

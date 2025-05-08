@@ -5,11 +5,14 @@ services:
       - "5050:5000"
     volumes:
       - .:/app
+      - /etc/localtime:/etc/localtime:ro  # Host saatini konteynerle eşitle
     depends_on:
       db:
         condition: service_healthy
     env_file:
       - .env
+    environment:
+      - TZ=Europe/Istanbul               # Türkiye saat dilimi
     restart: always
 
   db:
@@ -18,6 +21,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: hospital
+      TZ: Europe/Istanbul 
     ports:
       - "3306:3306"
     volumes:

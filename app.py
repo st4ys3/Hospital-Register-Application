@@ -7,7 +7,6 @@ import os
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
-# Ensure static/images directory exists
 os.makedirs('static/images', exist_ok=True)
 
 def get_db_connection():
@@ -76,11 +75,11 @@ def login():
 
     return render_template('login.html')
 
+    
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     session.pop('logged_in', None)
-    flash("Başarıyla çıkış yapıldı", "success")
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -153,6 +152,7 @@ def dashboard():
 
     return render_template('dashboard.html')
 
+
 @app.route('/patients')
 def patients():
     if 'user_id' not in session:
@@ -166,41 +166,26 @@ def patients():
     
     return render_template('patients.html', hastalar=hastalar)
 
-# Sabit kullanıcı adı ve şifre
-ADMIN_USERNAME = 'root'
-ADMIN_PASSWORD = 'root'
 
 @app.route('/backup', methods=['GET', 'POST'])
 def backup():
     log = ""
-    if 'logged_in' not in session:
-        session['logged_in'] = False
 
     if request.method == 'POST':
-        action = request.form.get('action')
+        try:
+            subprocess.run(['bash', 'backup.sh'], check=True)
+            flash("Backup başarıyla alındı.", "success")
 
-        if action == 'login':
-            username = request.form.get('username')
-            password = request.form.get('password')
+            with open('/var/log/backup.log', 'r') as f:
+                session['log'] = f.read()
 
-            if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
-                session['logged_in'] = True
-                flash("Giriş başarılı.", "success")
-            else:
-                flash("Kullanıcı adı veya şifre yanlış.", "danger")
+        except subprocess.CalledProcessError as e:
+            flash(f"Backup alınırken hata oluştu! Hata kodu: {e.returncode}", "error")
+            session['log'] = ""
 
-        elif action == 'backup' and session['logged_in']:
-            try:
-                subprocess.run(['bash', 'backup.sh'], check=True)
-                flash("Backup başarıyla alındı.", "success")
-            except subprocess.CalledProcessError:
-                flash("Backup alınırken hata oluştu.", "danger")
+        return redirect(url_for('backup'))
 
-            try:
-                with open('/var/log/backup.log', 'r') as f:
-                    log = f.read()
-            except FileNotFoundError:
-                log = "Log dosyası bulunamadı."
+    log = session.pop('log', '')
 
     return render_template('backup.html', log=log)
 

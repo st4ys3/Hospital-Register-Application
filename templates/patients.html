@@ -53,7 +53,7 @@
                     <tbody>
                         {% for hasta in hastalar %}
                             <tr>
-                                <td>{{ hasta.id }}</td>
+                                <td>{{ loop.index }}</td>
                                 <td>{{ hasta.ad }}</td>
                                 <td>{{ hasta.soyad }}</td>
                                 <td>{{ hasta.tc }}</td>

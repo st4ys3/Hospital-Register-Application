@@ -1,25 +1,25 @@
 #!/bin/bash
 
-# Yedekleme işlemi için gerekli değişkenler
-DB_USER="root"               # Veritabanı kullanıcı adı
-DB_PASSWORD="root"           # Veritabanı şifresi
-DB_NAME="hospital"           # Yedek alınacak veritabanı adı
-BACKUP_DIR="/home/yedekler" # Yedeklerin saklanacağı dizin (örneğin: /backups)
-LOG_FILE="/var/log/backup.log" # Log dosyasının yolu
+DB_USER="root"
+DB_PASSWORD="root"
+DB_NAME="hospital"
+BACKUP_DIR="/home/yedekler"
+LOG_FILE="/var/log/backup.log"
 
-# Yedekleme dosyasının ismi ve yolu (tarih ve saat eklenerek)
 DATE=$(date +'%Y-%m-%d_%H-%M-%S')
 BACKUP_FILE="$BACKUP_DIR/hospital_backup_$DATE.sql"
 
-# Veritabanını yedekleme komutu
-mysqldump -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" > "$BACKUP_FILE"
+mkdir -p "$BACKUP_DIR"
 
-# Yedekleme sonucu kontrolü
-if [ $? -eq 0 ]; then
-    # Yedekleme başarılıysa, log dosyasına bilgi ekle
-    BACKUP_SIZE=$(du -sh "$BACKUP_FILE" | cut -f1) # Yedek dosyasının boyutunu al
+
+mysqldump -h db -u "$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" > "$BACKUP_FILE"
+STATUS=$?
+
+
+if [ $STATUS -eq 0 ] && [ -s "$BACKUP_FILE" ]; then
+    BACKUP_SIZE=$(du -sh "$BACKUP_FILE" | cut -f1)
     echo "$(date +'%Y-%m-%d %H:%M:%S') - Yedekleme başarıyla alındı: $BACKUP_FILE (Boyut: $BACKUP_SIZE)" >> "$LOG_FILE"
 else
-    # Yedekleme başarısızsa, hata logu kaydet
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - Yedekleme alınamadı! Hata kodu: $?" >> "$LOG_FILE"
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - Yedekleme alınamadı! Hata kodu: $STATUS" >> "$LOG_FILE"
+    exit 1
 fi
