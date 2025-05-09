@@ -2,17 +2,14 @@ services:
   web:
     build: .
     ports:
-      - "5050:5000"
-    volumes:
-      - .:/app
-      - /etc/localtime:/etc/localtime:ro  # Host saatini konteynerle eşitle
+      - "8084:5000"
     depends_on:
       db:
         condition: service_healthy
     env_file:
       - .env
     environment:
-      - TZ=Europe/Istanbul               # Türkiye saat dilimi
+      - TZ=Europe/Istanbul               
     restart: always
 
   db:
@@ -35,3 +32,4 @@ services:
 
 volumes:
   mysql_data:
+

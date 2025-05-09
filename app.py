@@ -1,12 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, abort
 import subprocess
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import re
+import secrets
+from datetime import datetime, timedelta
+import html
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key'
-
+app.secret_key = 'your-secret-key'  
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 os.makedirs('static/images', exist_ok=True)
 
 def get_db_connection():
@@ -39,6 +43,8 @@ def create_tables():
             telefon VARCHAR(15),
             bolum VARCHAR(100),
             sikayet TEXT
+            personel_id INT,
+            FOREIGN KEY (personel_id) REFERENCES users(id) ON DELETE CASCADE
         )
     """)
     conn.commit()
@@ -160,7 +166,12 @@ def patients():
     
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM hastalar ORDER BY id DESC")
+    cursor.execute("""
+        SELECT h.*, u.username AS ekleyen 
+        FROM hastalar h
+        JOIN users u ON h.personel_id = u.id
+        ORDER BY h.id ASC
+    """)
     hastalar = cursor.fetchall()
     conn.close()
     
@@ -169,6 +180,11 @@ def patients():
 
 @app.route('/backup', methods=['GET', 'POST'])
 def backup():
+    # Oturum kontrolü - Giriş yapmamış kullanıcıları login sayfasına yönlendir
+    if 'user_id' not in session or not session.get('logged_in', False):
+        # Giriş yaptıktan sonra backup sayfasına dönmesi için next parametresi ekle
+        return redirect(url_for('login', next='/backup'))
+    
     log = ""
 
     if request.method == 'POST':
@@ -176,7 +192,10 @@ def backup():
             subprocess.run(['bash', 'backup.sh'], check=True)
             flash("Backup başarıyla alındı.", "success")
 
-            with open('/var/log/backup.log', 'r') as f:
+            # Bu satır:
+            # with open('/var/log/backup.log', 'r') as f:
+            # yerine şunu yaz:
+            with open('/app/backup_logs/backup.log', 'r') as f:
                 session['log'] = f.read()
 
         except subprocess.CalledProcessError as e:
@@ -188,6 +207,52 @@ def backup():
     log = session.pop('log', '')
 
     return render_template('backup.html', log=log)
+@app.route('/delete_patient/<int:patient_id>', methods=['POST'])
+def delete_patient(patient_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM hastalar WHERE id = %s", (patient_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Hasta başarıyla silindi!", "success")
+    return redirect(url_for('patients'))
+
+@app.route('/update_patient/<int:patient_id>', methods=['GET', 'POST'])
+def update_patient(patient_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        ad = request.form['ad']
+        soyad = request.form['soyad']
+        tc = request.form['tc']
+        telefon = request.form['telefon']
+        bolum = request.form['bolum']
+        sikayet = request.form['sikayet']
+
+        cursor.execute("""
+            UPDATE hastalar
+            SET ad = %s, soyad = %s, tc = %s, telefon = %s, bolum = %s, sikayet = %s
+            WHERE id = %s
+        """, (ad, soyad, tc, telefon, bolum, sikayet, patient_id))
+        conn.commit()
+        conn.close()
+
+        flash("Hasta bilgileri başarıyla güncellendi!", "success")
+        return redirect(url_for('patients'))
+
+    cursor.execute("SELECT * FROM hastalar WHERE id = %s", (patient_id,))
+    hasta = cursor.fetchone()
+    conn.close()
+
+    return render_template('update_patient.html', hasta=hasta)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
