@@ -4,8 +4,8 @@
 DB_USER="root"
 DB_PASSWORD="root"
 DB_NAME="hospital"
-BACKUP_DIR="/home/yedekler"
-LOG_FILE="/var/log/backup.log"
+BACKUP_DIR="/app/yedekler"
+LOG_FILE="/app/backup.log"
 
 # Dizinleri oluştur
 mkdir -p "$BACKUP_DIR"
