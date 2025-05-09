@@ -18,8 +18,8 @@ body {
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 450px;
-  max-width: 90%;
+  width: 90%;
+  max-width: 800px;
   transition: all 0.3s ease;
   margin: 40px auto;
 }
@@ -180,11 +180,13 @@ a:hover {
 /* Navbar Stili */
 .navbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 15px;
   border-bottom: 1px solid #e2e8f0;
+  gap: 10px;
 }
 
 .navbar h2 {
@@ -193,11 +195,24 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 10px;
+  white-space: nowrap;
+}
+
+/* Navbar username display */
+.navbar .username-display {
+  margin-left: auto;
+  margin-right: 15px;
+  color: #0ea5e9;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .navbar-actions {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .btn {
@@ -205,12 +220,13 @@ a:hover {
   color: #0ea5e9;
   box-shadow: none;
   width: auto;
-  padding: 8px 15px;
+  padding: 8px 12px;
   font-size: 14px;
   border: 1px solid #0ea5e9;
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
 }
 
 .btn:hover {
@@ -383,12 +399,18 @@ table tr:hover {
 
   .navbar {
     flex-direction: column;
-    gap: 15px;
+    align-items: flex-start;
   }
 
   .navbar-actions {
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
+    margin-top: 10px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 13px;
   }
 }
 
@@ -399,4 +421,34 @@ table tr:hover {
   margin-top: 50px;
   color: #64748b;
   font-size: 14px;
+}
+
+/* User welcome message style */
+.user-welcome {
+  font-size: 18px;
+  color: #0ea5e9;
+  margin: 10px 0 20px;
+  font-weight: 500;
+}
+
+/* User actions style */
+.user-actions {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.user-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 5px;
+}
+
+/* Table responsive styles */
+@media (max-width: 992px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

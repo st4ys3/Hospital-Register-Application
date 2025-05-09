@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hastane Yönetim Sistemi</title>
+    <title>Hoş Geldiniz - Hastane Yönetim Sistemi</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -15,6 +15,7 @@
                 <i class="fas fa-hospital"></i>
             </div>
             <h1>Hastane Yönetim Sistemi</h1>
+            <p class="user-welcome">Hoş geldiniz, <strong>{{ username }}</strong>!</p>
         </div>
 
         <img src="{{ url_for('static', filename='images/Hospital-img.png') }}" alt="Hastane Yönetim Sistemi" class="hero-image">
@@ -22,34 +23,40 @@
         <div class="welcome-cards">
             <div class="welcome-card">
                 <i class="fas fa-user-md"></i>
-                <h3>Hasta Kayıt Paneli</h3>
+                <h3>Hasta Kayıt</h3>
                 <p>Hastaların bilgilerini hızlıca kaydedin, düzenleyin ve görüntüleyin.</p>
-                <a href="/login" class="btn btn-primary">
-                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                <a href="/dashboard" class="btn btn-primary">
+                    <i class="fas fa-clipboard-list"></i> Hasta Kayıt
                 </a>
             </div>
             
             <div class="welcome-card">
                 <i class="fas fa-database"></i>
-                <h3>Veritabanı Yedekleme</h3>
+                <h3>Yedekleme</h3>
                 <p>Hasta verilerinizi güvende tutmak için düzenli yedeklemeler yapın.</p>
-                <a href="/login?next=/backup" class="btn btn-primary">
-                    <i class="fas fa-database"></i> Yedekleme Paneli
+                <a href="/backup" class="btn btn-primary">
+                    <i class="fas fa-database"></i> Yedekleme
                 </a>
             </div>
             
             <div class="welcome-card">
-                <i class="fas fa-user-plus"></i>
-                <h3>Yeni Hesap Oluştur</h3>
-                <p>Sisteme erişim için yeni bir kullanıcı hesabı oluşturun.</p>
-                <a href="/register" class="btn btn-primary">
-                    <i class="fas fa-user-plus"></i> Kayıt Ol
+                <i class="fas fa-users"></i>
+                <h3>Hasta Listesi</h3>
+                <p>Kayıtlı hastaları görüntüleyin, düzenleyin veya silin.</p>
+                <a href="/patients" class="btn btn-primary">
+                    <i class="fas fa-users"></i> Hasta Listesi
                 </a>
             </div>
         </div>
 
+        <div class="user-actions" style="text-align: center; margin-top: 30px;">
+            <a href="/logout" class="btn" style="display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+            </a>
+        </div>
+
         <div class="footer">
-            <p>&copy; 2025 Hastane Yönetim Sistemi.</p>
+            <p>&copy; 2024 Hastane Yönetim Sistemi. Tüm hakları saklıdır.</p>
         </div>
     </div>
 </body>

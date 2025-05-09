@@ -12,10 +12,13 @@
     <div class="container">
         <div class="table-container">
             <div class="navbar">
-                <h2><i class="fas fa-users"></i> Kayıtlı Hastalar</h2>
+                <h2><i class="fas fa-users"></i> Hasta Listesi</h2>
                 <div class="navbar-actions">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Ana Sayfa
+                    </a>
                     <a href="/dashboard" class="btn btn-secondary">
-                        <i class="fas fa-user-plus"></i> Yeni Hasta Ekle
+                        <i class="fas fa-user-plus"></i> Hasta Kayıt
                     </a>
                     <a href="/backup" class="btn btn-secondary">
                         <i class="fas fa-database"></i> Yedekleme
@@ -38,39 +41,56 @@
             {% endwith %}
 
             {% if hastalar %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Ad</th>
-                            <th>Soyad</th>
-                            <th>TC Kimlik No</th>
-                            <th>Telefon</th>
-                            <th>Bölüm</th>
-                            <th>Şikayet</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for hasta in hastalar %}
+                <div class="table-responsive">
+                    <table>
+                        <thead>
                             <tr>
-                                <td>{{ loop.index }}</td>
-                                <td>{{ hasta.ad }}</td>
-                                <td>{{ hasta.soyad }}</td>
-                                <td>{{ hasta.tc }}</td>
-                                <td>{{ hasta.telefon }}</td>
-                                <td>{{ hasta.bolum }}</td>
-                                <td>{{ hasta.sikayet }}</td>
+                                <th>ID</th>
+                                <th>Ad</th>
+                                <th>Soyad</th>
+                                <th>TC Kimlik No</th>
+                                <th>Telefon</th>
+                                <th>Bölüm</th>
+                                <th>Şikayet</th>
+                                <th>Ekleyen</th>
+                                <th>İşlemler</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for hasta in hastalar %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ hasta.ad }}</td>
+                                    <td>{{ hasta.soyad }}</td>
+                                    <td>{{ hasta.tc }}</td>
+                                    <td>{{ hasta.telefon }}</td>
+                                    <td>{{ hasta.bolum }}</td>
+                                    <td>{{ hasta.sikayet }}</td>
+                                    <td>{{ hasta.ekleyen if hasta.ekleyen else 'Bilinmiyor' }}</td>
+                                    <td>
+                                        <div style="display: flex; gap: 5px;">
+                                            <a href="{{ url_for('update_patient', patient_id=hasta.id) }}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">
+                                                <i class="fas fa-edit"></i> Düzenle
+                                            </a>
+                                            <form action="{{ url_for('delete_patient', patient_id=hasta.id) }}" method="POST" onsubmit="return confirm('Bu hastayı silmek istediğinizden emin misiniz?');" style="margin: 0;">
+                                                <button type="submit" class="btn" style="background-color: #ef4444; padding: 5px 10px; font-size: 12px;">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <div class="empty-state">
                     <i class="fas fa-user-slash"></i>
                     <h3>Henüz Kayıtlı Hasta Bulunmamaktadır</h3>
-                    <p>Yeni hasta eklemek için "Yeni Hasta Ekle" butonuna tıklayabilirsiniz.</p>
+                    <p>Yeni hasta eklemek için "Hasta Kayıt" butonuna tıklayabilirsiniz.</p>
                     <a href="/dashboard" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Yeni Hasta Ekle
+                        <i class="fas fa-user-plus"></i> Hasta Kayıt
                     </a>
                 </div>
             {% endif %}

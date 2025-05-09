@@ -26,7 +26,8 @@
             {% endif %}
         {% endwith %}
         
-        <form method="POST" action="/login">
+        <form method="POST" action="{{ url_for('login', next=request.args.get('next', '')) }}">
+            <input type="hidden" name="next" value="{{ next }}">
             <div class="input-group">
                 <label for="username">Kullanıcı Adı</label>
                 <input type="text" id="username" name="username" placeholder="Kullanıcı adınızı girin" required>

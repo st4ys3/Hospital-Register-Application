@@ -12,10 +12,13 @@
    <div class="container">
        <div class="form-container">
            <div class="navbar">
-               <h2><i class="fas fa-hospital-user"></i> Hasta Kayıt Paneli</h2>
+               <h2><i class="fas fa-hospital-user"></i> Hasta Kayıt</h2>
                <div class="navbar-actions">
+                   <a href="/" class="btn btn-secondary">
+                       <i class="fas fa-home"></i> Ana Sayfa
+                   </a>
                    <a href="/patients" class="btn btn-secondary">
-                       <i class="fas fa-users"></i> Kayıtlı Hastalar
+                       <i class="fas fa-users"></i> Hasta Listesi
                    </a>
                    <a href="/backup" class="btn btn-secondary">
                     <i class="fas fa-database"></i> Yedekleme
@@ -37,7 +40,7 @@
                {% endif %}
            {% endwith %}
 
-           <form method="POST" action="/dashboard">
+           <form method="POST" action="/dashboard" id="patient-form">
                <div class="input-group">
                    <label for="ad">Ad</label>
                    <input type="text" id="ad" name="ad" placeholder="Hastanın adını girin" required>
@@ -50,7 +53,7 @@
               
                <div class="input-group">
                    <label for="tc">TC Kimlik No</label>
-                   <input type="text" id="tc" name="tc" placeholder="TC kimlik numarasını girin" required>
+                   <input type="text" id="tc" name="tc" placeholder="TC kimlik numarasını girin" maxlength="11" required>
                </div>
               
                <div class="input-group">
@@ -123,7 +126,6 @@
            </form>
        </div>
    </div>
+   <script src="{{ url_for('static', filename='js/validate.js') }}"></script>
 </body>
 </html>
-
-

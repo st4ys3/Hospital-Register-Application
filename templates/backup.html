@@ -3,7 +3,7 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Backup Paneli - Hastane Yönetim Sistemi</title>
+   <title>Yedekleme - Hastane Yönetim Sistemi</title>
    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -11,10 +11,23 @@
 <body>
    <div class="container">
        <div class="form-container">
-           <div class="logo">
-               <i class="fas fa-database"></i>
+           <div class="navbar">
+               <h2><i class="fas fa-database"></i> Yedekleme</h2>
+               <div class="navbar-actions">
+                   <a href="/" class="btn btn-secondary">
+                       <i class="fas fa-home"></i> Ana Sayfa
+                   </a>
+                   <a href="/dashboard" class="btn btn-secondary">
+                       <i class="fas fa-user-plus"></i> Hasta Kayıt
+                   </a>
+                   <a href="/patients" class="btn btn-secondary">
+                       <i class="fas fa-users"></i> Hasta Listesi
+                   </a>
+                   <a href="/logout" class="btn">
+                       <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                   </a>
+               </div>
            </div>
-           <h2>Veritabanı Yedeği</h2>
 
            {% with messages = get_flashed_messages(with_categories=true) %}
                {% if messages %}
@@ -27,17 +40,16 @@
            {% endwith %}
 
            <!-- Backup Butonu -->
-           <form method="POST">
+           <form method="POST" action="{{ url_for('backup') }}">
                <button type="submit" name="action" value="backup">
                    <i class="fas fa-download"></i> Backup Al
                </button>
-               <p><a href="/">Ana Sayfaya Dön</a></p>
            </form>
 
            {% if log %}
            <div class="table-container" style="margin-top: 20px;">
-               <h3>Backup Log</h3>
-               <pre style="background: #f1f5f9; padding: 15px; border-radius: 8px; overflow: auto;">{{ log }}</pre>
+               <h3><i class="fas fa-clipboard-list"></i> Yedekleme Günlüğü</h3>
+               <pre style="background: #f1f5f9; padding: 15px; border-radius: 8px; overflow: auto; max-height: 300px;">{{ log }}</pre>
            </div>
            {% endif %}
        </div>
