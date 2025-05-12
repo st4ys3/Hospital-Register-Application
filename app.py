@@ -10,31 +10,19 @@ import html
 from functools import wraps
 import uuid
 import hashlib
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('app.log')
-    ]
-)
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 # Generate a secure random secret key
 app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
-app.config['SESSION_COOKIE_SECURE'] = False  # Changed to False for development
+app.config['SESSION_COOKIE_SECURE'] = True  # Changed to False for development
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to cookies
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
 
 # Create directories
 os.makedirs('static/images', exist_ok=True)
 os.makedirs('/app/backup_logs', exist_ok=True)
-os.makedirs('/app/yedekler', exist_ok=True)  # Create backup directory with proper permissions
+os.makedirs('/app/yedekler', exist_ok=True)  
 
 # Generate CSRF token
 def generate_csrf_token():
@@ -54,8 +42,6 @@ def csrf_protect(f):
         if request.method == 'POST':
             token = session.get('csrf_token')
             form_token = request.form.get('csrf_token')
-            
-            logger.debug(f"CSRF check - Session token: {token}, Form token: {form_token}")
             
             if not token or not form_token or token != form_token:
                 flash("CSRF doğrulama hatası. Lütfen tekrar deneyin.", "danger")
@@ -98,10 +84,10 @@ def get_db_connection():
             database='hospital',
             cursorclass=pymysql.cursors.DictCursor
         )
-        logger.debug("Database connection successful")
         return connection
     except Exception as e:
-        logger.error(f"Database connection error: {str(e)}")
+        # Only log critical database connection errors
+        print(f"Database connection error: {str(e)}")
         raise
 
 def create_tables():
@@ -150,9 +136,8 @@ def create_tables():
         
         conn.commit()
         conn.close()
-        logger.info("Tables created successfully")
     except Exception as e:
-        logger.error(f"Error creating tables: {str(e)}")
+        print(f"Error creating tables: {str(e)}")
         raise
 
 # Log user actions
@@ -178,8 +163,9 @@ def log_action(action, resource_type, resource_id, details=None):
         
         conn.commit()
         conn.close()
-    except Exception as e:
-        logger.error(f"Error logging action: {str(e)}")
+    except Exception:
+        # Silently fail on logging errors
+        pass
 
 @app.before_request
 def ensure_tables_exist():
@@ -188,12 +174,11 @@ def ensure_tables_exist():
             create_tables()
             app.tables_created = True
         except Exception as e:
-            logger.error(f"Failed to create tables: {str(e)}")
+            print(f"Failed to create tables: {str(e)}")
             # Don't set app.tables_created so we'll try again on the next request
 
 @app.route('/')
 def index():
-    logger.debug(f"Index route accessed. Session: {session}")
     if 'user_id' in session:
         # User is logged in, show welcome page with user info
         return render_template('welcome.html', username=session.get('username'))
@@ -203,25 +188,21 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 @csrf_protect
 def login():
-    logger.debug(f"Login route accessed. Method: {request.method}")
-    
     # If user is already logged in, redirect to dashboard
     if 'user_id' in session:
-        logger.debug("User already logged in, redirecting to dashboard")
         return redirect(url_for('dashboard'))
         
     if request.method == 'POST':
         try:
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '')
-            logger.debug(f"Login attempt for username: {username}")
 
             # Validate input
             if not username or not password:
                 flash("Kullanıcı adı ve şifre gereklidir.", "danger")
                 return redirect(url_for('login'))
 
-            # Rate limiting check (simple implementation)
+            # Rate limiting check 
             ip = request.remote_addr
             current_time = datetime.now()
             if 'login_attempts' not in session:
@@ -238,8 +219,6 @@ def login():
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
             conn.close()
-
-            logger.debug(f"User found: {user is not None}")
             
             if user and check_password_hash(user['password'], password):
                 # Reset login attempts on successful login
@@ -257,8 +236,6 @@ def login():
                 # Log successful login
                 log_action('login', 'user', user['id'], 'Successful login')
                 
-                logger.debug(f"Login successful. Session: {session}")
-                
                 # Check if there's a next parameter for redirection
                 next_page = request.form.get('next') or request.args.get('next')
                 if next_page and next_page.startswith('/'):  # Ensure URL is relative
@@ -270,10 +247,8 @@ def login():
                 session['login_last_attempt'] = current_time.timestamp()
                 
                 flash("Geçersiz kullanıcı adı veya şifre", "danger")
-                logger.debug("Login failed: Invalid username or password")
                 return redirect(url_for('login'))
         except Exception as e:
-            logger.error(f"Error during login: {str(e)}")
             flash("Giriş sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
             return redirect(url_for('login'))
 
@@ -283,7 +258,6 @@ def login():
 
 @app.route('/logout')
 def logout():
-    logger.debug("Logout route accessed")
     if 'user_id' in session:
         user_id = session.get('user_id')
         log_action('logout', 'user', user_id, 'User logged out')
@@ -302,15 +276,11 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 @csrf_protect
 def register():
-    logger.debug(f"Register route accessed. Method: {request.method}")
-    
     if request.method == 'POST':
         try:
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '')
             confirm = request.form.get('confirm_password', '')
-            
-            logger.debug(f"Registration attempt for username: {username}")
 
             # Validate input
             if not username or not password or not confirm:
@@ -350,15 +320,12 @@ def register():
             conn.commit()
             conn.close()
             
-            logger.debug(f"User registered successfully. ID: {new_user_id}")
-            
             # Log user registration
             log_action('register', 'user', new_user_id, 'New user registered')
             
             flash("Kayıt başarılı. Giriş yapabilirsiniz.", "success")
             return redirect(url_for('login'))
         except Exception as e:
-            logger.error(f"Error during registration: {str(e)}")
             flash("Kayıt sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
             return redirect(url_for('register'))
 
@@ -368,8 +335,6 @@ def register():
 @login_required
 @csrf_protect
 def dashboard():
-    logger.debug(f"Dashboard route accessed. Method: {request.method}")
-    
     if request.method == 'POST':
         try:
             ad = request.form.get('ad', '').strip()
@@ -378,8 +343,6 @@ def dashboard():
             telefon = request.form.get('telefon', '').strip()
             bolum = request.form.get('bolum', '')
             sikayet = request.form.get('sikayet', '').strip()
-            
-            logger.debug(f"Patient registration attempt: {ad} {soyad}")
             
             # Validate input
             if not ad or not soyad or not tc or not telefon or not bolum or not sikayet:
@@ -413,15 +376,12 @@ def dashboard():
             conn.commit()
             conn.close()
 
-            logger.debug(f"Patient registered successfully. ID: {new_patient_id}")
-
             # Log patient creation
             log_action('create', 'patient', new_patient_id, f'Added new patient: {ad} {soyad}')
 
             flash("Hasta başarıyla kaydedildi!", "success")
             return redirect(url_for('dashboard'))
         except Exception as e:
-            logger.error(f"Error during patient registration: {str(e)}")
             flash("Hasta kaydı sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
             return redirect(url_for('dashboard'))
 
@@ -431,8 +391,6 @@ def dashboard():
 @login_required
 def patients():
     try:
-        logger.debug("Patients route accessed")
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         
@@ -456,11 +414,8 @@ def patients():
         hastalar = cursor.fetchall()
         conn.close()
         
-        logger.debug(f"Retrieved {len(hastalar)} patients")
-        
         return render_template('patients.html', hastalar=hastalar)
     except Exception as e:
-        logger.error(f"Error retrieving patients: {str(e)}")
         flash("Hasta listesi alınırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
         return redirect(url_for('index'))
 
@@ -468,18 +423,16 @@ def patients():
 @login_required
 @csrf_protect
 def backup():
-    logger.debug(f"Backup route accessed. Method: {request.method}")
-    
     log = ""
 
     if request.method == 'POST':
         try:
             # Create backup directory if it doesn't exist
-            os.makedirs('/app/yedekler', exist_ok=True)  # Changed from /home/yedekler to /app/yedekler
+            os.makedirs('/app/yedekler', exist_ok=True)
             os.makedirs('/app/backup_logs', exist_ok=True)
             
             # Create log file if it doesn't exist
-            if not os.path.exists('/app/backup.log'):  # Changed from /var/log/backup.log to /app/backup.log
+            if not os.path.exists('/app/backup.log'):
                 open('/app/backup.log', 'a').close()
                 
             subprocess.run(['bash', 'backup.sh'], check=True)
@@ -489,7 +442,7 @@ def backup():
             log_action('backup', 'database', None, 'Database backup created')
 
             try:
-                with open('/app/backup.log', 'r') as f:  # Changed from /var/log/backup.log to /app/backup.log
+                with open('/app/backup.log', 'r') as f:
                     session['log'] = f.read()
             except FileNotFoundError:
                 session['log'] = "Log dosyası bulunamadı."
@@ -500,7 +453,6 @@ def backup():
             flash(f"Backup alınırken hata oluştu! Hata kodu: {e.returncode}", "danger")
             session['log'] = ""
         except Exception as e:
-            logger.error(f"Error during backup: {str(e)}")
             flash(f"Beklenmeyen bir hata oluştu: {str(e)}", "danger")
             session['log'] = ""
 
@@ -515,8 +467,6 @@ def backup():
 @csrf_protect
 def delete_patient(patient_id):
     try:
-        logger.debug(f"Delete patient route accessed. Patient ID: {patient_id}")
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         
@@ -541,15 +491,12 @@ def delete_patient(patient_id):
         conn.commit()
         conn.close()
 
-        logger.debug(f"Patient deleted successfully. ID: {patient_id}")
-
         # Log patient deletion
         log_action('delete', 'patient', patient_id, f'Deleted patient: {hasta["ad"]} {hasta["soyad"]}')
 
         flash("Hasta başarıyla silindi!", "success")
         return redirect(url_for('patients'))
     except Exception as e:
-        logger.error(f"Error deleting patient: {str(e)}")
         flash("Hasta silinirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
         return redirect(url_for('patients'))
 
@@ -558,8 +505,6 @@ def delete_patient(patient_id):
 @csrf_protect
 def update_patient(patient_id):
     try:
-        logger.debug(f"Update patient route accessed. Patient ID: {patient_id}, Method: {request.method}")
-        
         conn = get_db_connection()
         cursor = conn.cursor()
 
@@ -586,8 +531,6 @@ def update_patient(patient_id):
             telefon = request.form.get('telefon', '').strip()
             bolum = request.form.get('bolum', '')
             sikayet = request.form.get('sikayet', '').strip()
-            
-            logger.debug(f"Patient update attempt: {ad} {soyad}")
             
             # Validate input
             if not ad or not soyad or not tc or not telefon or not bolum or not sikayet:
@@ -619,8 +562,6 @@ def update_patient(patient_id):
             conn.commit()
             conn.close()
 
-            logger.debug(f"Patient updated successfully. ID: {patient_id}")
-
             # Log patient update
             log_action('update', 'patient', patient_id, f'Updated patient: {ad} {soyad}')
 
@@ -630,28 +571,24 @@ def update_patient(patient_id):
         conn.close()
         return render_template('update_patient.html', hasta=hasta)
     except Exception as e:
-        logger.error(f"Error updating patient: {str(e)}")
         flash("Hasta güncellenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "danger")
         return redirect(url_for('patients'))
 
 @app.errorhandler(404)
 def page_not_found(e):
-    logger.debug("404 error handler triggered")
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    logger.error(f"500 error: {str(e)}")
     return render_template('500.html'), 500
 
 @app.errorhandler(403)
 def forbidden(e):
-    logger.debug("403 error handler triggered")
     return render_template('403.html'), 403
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    logger.error(f"Unhandled exception: {str(e)}")
+    print(f"Unhandled exception: {str(e)}")
     return render_template('500.html'), 500
 
 @app.after_request
@@ -660,14 +597,9 @@ def add_security_headers(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
-    # Temporarily disable CSP for debugging
-    # response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     return response
 
 if __name__ == '__main__':
-    # In production, use a proper WSGI server like Gunicorn
-    # For Docker deployment, we need to bind to 0.0.0.0
-    # but we'll ensure debug mode is disabled in production
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=5000, debug=debug_mode)
