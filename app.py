@@ -175,7 +175,6 @@ def ensure_tables_exist():
             app.tables_created = True
         except Exception as e:
             print(f"Failed to create tables: {str(e)}")
-            # Don't set app.tables_created so we'll try again on the next request
 
 @app.route('/')
 def index():
