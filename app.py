@@ -264,7 +264,6 @@ def logout():
     
     # Clear session
     session.clear()
-    flash("Başarıyla çıkış yaptınız.", "success")
     
     # Set cache control headers to prevent back button from showing authenticated content
     response = make_response(redirect(url_for('index')))
