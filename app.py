@@ -166,7 +166,6 @@ def log_action(action, resource_type, resource_id, details=None):
         conn.commit()
         conn.close()
     except Exception:
-        # Silently fail on logging errors
         pass
 
 @app.before_request
@@ -181,15 +180,12 @@ def ensure_tables_exist():
 @app.route('/')
 def index():
     if 'user_id' in session:
-        # User is logged in, show welcome page with user info
         return render_template('welcome.html', username=session.get('username'))
-    # User is not logged in, show regular index page
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 @csrf_protect
 def login():
-    # If user is already logged in, redirect to dashboard
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
         
@@ -198,7 +194,6 @@ def login():
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '')
 
-            # Validate input
             if not username or not password:
                 flash("Kullanıcı adı ve şifre gereklidir.", "danger")
                 return redirect(url_for('login'))
@@ -263,7 +258,6 @@ def logout():
         user_id = session.get('user_id')
         log_action('logout', 'user', user_id, 'User logged out')
     
-    # Clear session
     session.clear()
     
     # Set cache control headers to prevent back button from showing authenticated content
@@ -295,7 +289,6 @@ def register():
                 flash("Şifre en az 6 karakter olmalıdır.", "danger")
                 return redirect(url_for('register'))
 
-            # Check password complexity
             if not re.search(r'[A-Z]', password) or not re.search(r'[a-z]', password) or not re.search(r'[0-9]', password):
                 flash("Şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.", "danger")
                 return redirect(url_for('register'))
@@ -466,7 +459,6 @@ def delete_patient(patient_id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # First check if the patient exists
         cursor.execute("SELECT * FROM hastalar WHERE id = %s", (patient_id,))
         hasta = cursor.fetchone()
         
@@ -475,7 +467,6 @@ def delete_patient(patient_id):
             conn.close()
             return redirect(url_for('patients'))
         
-        # Check if the user has permission to delete this patient
         if hasta['personel_id'] != session['user_id'] and session.get('role') != 'admin':
             flash("Bu hastayı silme yetkiniz yok.", "danger")
             conn.close()
@@ -504,7 +495,6 @@ def update_patient(patient_id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # First check if the patient exists
         cursor.execute("SELECT * FROM hastalar WHERE id = %s", (patient_id,))
         hasta = cursor.fetchone()
         
@@ -513,7 +503,6 @@ def update_patient(patient_id):
             conn.close()
             return redirect(url_for('patients'))
             
-        # Check if the user has permission to update this patient
         if hasta['personel_id'] != session['user_id'] and session.get('role') != 'admin':
             flash("Bu hastayı düzenleme yetkiniz yok.", "danger")
             conn.close()
@@ -545,7 +534,6 @@ def update_patient(patient_id):
                flash("Telefon numarası geçerli değil.", "danger")
                return redirect(url_for('update_patient', patient_id=patient_id))
 
-            # Sanitize input
             ad = html.escape(ad)
             soyad = html.escape(soyad)
             sikayet = html.escape(sikayet)
@@ -596,6 +584,7 @@ def add_security_headers(response):
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     return response
 
+# Run the Flask development server
 if __name__ == '__main__':
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=5000, debug=debug_mode)
