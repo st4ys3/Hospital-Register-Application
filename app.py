@@ -10,14 +10,15 @@ import html
 from functools import wraps
 import uuid
 import hashlib
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 # Generate a secure random secret key
-app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or secrets.token_hex(32)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
-app.config['SESSION_COOKIE_SECURE'] = True  # Changed to False for development
-app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to cookies
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
+app.config['SESSION_COOKIE_SECURE'] = False  
+app.config['SESSION_COOKIE_HTTPONLY'] = True  
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax' 
 
 # Create directories
 os.makedirs('static/images', exist_ok=True)
@@ -45,7 +46,7 @@ def csrf_protect(f):
             
             if not token or not form_token or token != form_token:
                 flash("CSRF doğrulama hatası. Lütfen tekrar deneyin.", "danger")
-                return redirect(url_for('index'))
+                return redirect(url_for('index')) and print("CSRF token mismatch")
         return f(*args, **kwargs)
     return decorated_function
 
@@ -75,18 +76,19 @@ def check_resource_permission(patient_id):
     # Check if the user is the owner of the resource
     return hasta['personel_id'] == session.get('user_id')
 
+load_dotenv()
+
 def get_db_connection():
     try:
         connection = pymysql.connect(
             host='db',
-            user='root',
-            password='root',
-            database='hospital',
+            user=os.getenv("MYSQL_USER"),
+            password=os.getenv("MYSQL_PASSWORD"),
+            database=os.getenv("MYSQL_DATABASE"),
             cursorclass=pymysql.cursors.DictCursor
         )
         return connection
     except Exception as e:
-        # Only log critical database connection errors
         print(f"Database connection error: {str(e)}")
         raise
 
@@ -392,7 +394,6 @@ def patients():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Only show patients created by the current user unless admin
         if session.get('role') == 'admin':
             cursor.execute("""
                 SELECT h.*, u.username AS ekleyen 
@@ -425,18 +426,15 @@ def backup():
 
     if request.method == 'POST':
         try:
-            # Create backup directory if it doesn't exist
             os.makedirs('/app/yedekler', exist_ok=True)
             os.makedirs('/app/backup_logs', exist_ok=True)
             
-            # Create log file if it doesn't exist
             if not os.path.exists('/app/backup.log'):
                 open('/app/backup.log', 'a').close()
                 
             subprocess.run(['bash', 'backup.sh'], check=True)
             flash("Backup başarıyla alındı.", "success")
 
-            # Log backup action
             log_action('backup', 'database', None, 'Database backup created')
 
             try:
